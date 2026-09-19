@@ -63,7 +63,7 @@ codex login --device-auth
 
 Codex 支持配置模型提供商，但平台必须与客户端所需的协议、认证、模型和 Agent 行为兼容。具体配置应以 Codex 当前配置说明和平台文档为准。即使模型能返回内容，也不代表 Codex 云端、插件、OAuth 连接或套餐权益可用。
 
-如果希望少折腾，可以参考 [APIDock 一键接入文档](https://apidock.ai/docs/apidock-easy-install)。先确认它当前支持的客户端和模型，再使用独立 Token 小额测试。
+如果希望少折腾，可以参考[第三方平台接入文档](https://apidock.ai/docs/apidock-easy-install)。先确认它当前支持的客户端和模型，再使用独立 Token 小额测试。
 
 ## API 模型为什么不等于 Codex？
 
@@ -76,7 +76,7 @@ GPT 模型可以理解代码并生成修改建议，但完整的编程 Agent 还
 - 展示 diff 并让用户审查；
 - 隔离权限和保护密钥。
 
-因此，“某个平台支持 GPT-5.6 API”和“这个平台提供完整 Codex 体验”不是同一个结论。
+因此，“某个平台支持 GPT-6 Astra 或 GPT-5.6 API”和“这个平台提供完整 Codex 体验”不是同一个结论。
 
 ## 国内使用 Codex 的安全建议
 
@@ -102,7 +102,7 @@ GPT 模型可以理解代码并生成修改建议，但完整的编程 Agent 还
 
 ### 手机验证失败怎么办？
 
-先确认卡在 ChatGPT 登录、OpenAI Platform 创建 API Key，还是账号安全验证。不要购买来路不明的接码号。若只是需要模型 API，可以评估 APIDock 这类兼容接口，但它不会替代官方 Codex 账号。
+先确认卡在 ChatGPT 登录、OpenAI Platform 创建 API Key，还是账号安全验证。不要购买来路不明的接码号。若只是需要模型 API，可以评估第三方兼容接口，但它不会替代官方 Codex 账号。
 
 ## 相关阅读
 

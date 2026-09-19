@@ -1,66 +1,63 @@
-# ChatGPT API 国内接入教程：GPT-5.6、Codex API 与中转站指南
+# GPT API、Claude API 国内接入教程：GPT-6 Astra、GPT-5.6、Opus 5、Fable 5.1 与中转站
 
-本仓库专门整理 **ChatGPT API 国内怎么用、OpenAI API 国内如何接入、GPT-5.6 API 怎么调用、Codex 国内怎么使用** 等常见问题，面向没有海外信用卡、无法顺利创建官方 API Key，或希望使用国内常用支付方式的开发者。
+想在国内调用 GPT API 或 Claude API？本文以 GPT-6 Astra、GPT-5.6、Claude Opus 5 和 Fable 5.1 为例，介绍模型 ID、官方接口与中转站的区别，并给出可直接运行的 `curl` 和 Python 接入示例。
 
-这里提供可以直接复制的 `curl`、Python 和 Node.js 示例，也会讲清楚 ChatGPT 会员、Codex、OpenAI 官方 API 和 API 中转站之间的区别。
+> 更新于 2026-09-19。模型开放范围、接口能力和价格会变化，实际以[OpenAI 模型列表](https://developers.openai.com/api/docs/models)、[Claude 模型列表](https://platform.claude.com/docs/en/models/overview)及服务商后台为准。本仓库是独立教程，与模型厂商无官方关联。
 
-> 更新日期：2026-08-23。模型、价格和接口能力都可能变化，请在使用前核对 [OpenAI 官方模型文档](https://developers.openai.com/api/docs/models) 与所选平台的实时说明。
+## 先选接入方式
 
-## 先看结论：国内使用 GPT API 有哪些方式？
+| 方式 | 需要准备 | 适用情况 |
+| --- | --- | --- |
+| 官方 API | 对应厂商的开发者账号、API Key、受支持的地区与付款方式 | 希望直接使用官方接口与完整功能 |
+| 兼容中转服务 | 服务商签发的 Token、Base URL、可用模型名 | 官方账号、付款或网络接入不方便时，先小额验证 |
 
-| 使用方式 | 适合谁 | 需要准备什么 | 需要注意 |
-| --- | --- | --- | --- |
-| OpenAI 官方 API | 已有官方开发者账号和可用付款方式 | API Key、可访问官方 API 的网络 | 按官方 API 用量单独计费 |
-| ChatGPT 账号登录 Codex | 已有包含 Codex 权益的 ChatGPT 套餐 | ChatGPT 账号、Codex CLI 或 IDE 扩展 | 使用套餐权益，不是 API 余额 |
-| OpenAI 兼容中转 API | 官方账号、付款或网络路径不方便 | 中转站 Token、API Base URL | 数据会经过服务商，建议先小额测试 |
+国内直接接入 GPT API、Claude API 需要中转，否则无法直接接入。 
 
-如果你的目标是把模型接入程序、脚本、网站、Bot 或 AI Agent，使用的是 **API**；如果只是想在官方网页聊天，使用的是 **ChatGPT 产品**。二者账号体系、额度和计费方式不能混用。
+需要中转服务的话，可以参考我推荐的[这家兼容服务及选择方法](https://apidock.ai/)。 
 
-## 5 分钟调用一次 GPT API
+![](https://file1.kamacoder.com/i/web/20260919161434-n3c8v9.png)
 
-### 1. 准备 API Key 和接口地址
+它提供独立 Token 和接入说明；**先确认所需模型是否开放、支持哪种接口协议，再用小额请求测试**。中转服务会处理请求内容，敏感数据应先评估隐私条款。
 
-官方 OpenAI API：
+ChatGPT Plus、Claude 订阅与 API 用量分别计费；网页会员资格不能直接当作 API Key 使用。中转 Token 也不能登录官方产品。
+
+## 这几个模型怎么选
+
+| 模型 | API 模型 ID | 适合的起点 |
+| --- | --- | --- |
+| GPT-5.6 Luna | `gpt-5.6-luna` | 摘要、分类等高频轻任务 |
+| GPT-5.6 Terra | `gpt-5.6-terra` | 日常编程、内容生成，兼顾效果与成本 |
+| GPT-5.6 Sol | `gpt-5.6-sol` | 更复杂的代码与专业任务 |
+| GPT-6 Astra | `gpt-6-astra` | 高难度推理、长流程和工具协作 |
+| Claude Opus 5 | `claude-opus-5` | 复杂编程与日常 Agent 工作流 |
+| Claude Fable 5.1 | `claude-fable-5-1` | 更难的长流程推理、研究与 Agent 任务 |
+
+这只是选型起点，生产环境最好用自己的任务比较效果、延迟和每次完成任务的成本。[OpenAI 模型说明](https://developers.openai.com/api/docs/models)与[Claude 选型指南](https://platform.claude.com/docs/en/about-claude/models/choosing-a-model)提供最新定位。
+
+## 调用 GPT：OpenAI Responses API
+
+先设置 Key 与 Base URL。使用官方 API 时：
 
 ```bash
-export OPENAI_API_KEY="替换成你的 OpenAI API Key"
+export OPENAI_API_KEY="你的官方 API Key"
 export OPENAI_BASE_URL="https://api.openai.com/v1"
 ```
 
-如果没有合适的官方账号或付款方式，可以使用 OpenAI 兼容接口。我自己更推荐 [APIDock](https://apidock.ai/)：注册后创建独立 Token，支持国内常用支付方式，接口格式与 OpenAI SDK 兼容，适合先用小额请求跑通。
-
-如果不懂的话，也可以去问 APIDock 的客服，一般接入问题，他们都会回答：
-
-![](https://file1.kamacoder.com/i/web/2026-08-23_17-22-15.jpg)
+使用支持 **Responses API** 的中转服务时，把两项分别换成服务商 Token 和其提供的 OpenAI 兼容 Base URL。不要凭域名猜测路径，也不要把真实 Token 提交到 GitHub。
 
 ```bash
-export OPENAI_API_KEY="替换成你的 APIDock Token"
-export OPENAI_BASE_URL="https://apidock.ai/v1"
-```
-
-不要把真实 Token 写进准备提交到 GitHub 的代码文件。
-
-### 2. 使用 curl 测试
-
-`chat/completions` 是很多 OpenAI 兼容服务都支持的接口，适合先测试连通性：
-
-```bash
-curl "${OPENAI_BASE_URL}/chat/completions" \
+curl "${OPENAI_BASE_URL}/responses" \
   -H "Authorization: Bearer ${OPENAI_API_KEY}" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-5.6-terra",
-    "messages": [
-      {"role": "user", "content": "用一句话解释什么是 GPT API"}
-    ]
+    "input": "用一句话解释 API 是什么"
   }'
 ```
 
-如果返回 `401`，优先检查 Token；返回 `404`，检查 Base URL、接口路径和模型名；返回 `429`，检查余额、额度和请求频率。
+想测试最新旗舰模型，将 `model` 改为 `gpt-6-astra`。中转服务若只兼容 `/chat/completions`，应按其文档调整请求格式；工具调用等高级能力也需逐项验证。
 
-### 3. 使用 Python 调用
-
-先安装官方 SDK：
+Python 项目可使用官方 SDK：
 
 ```bash
 pip install openai
@@ -74,97 +71,43 @@ client = OpenAI(
     api_key=os.environ["OPENAI_API_KEY"],
     base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
 )
-
-response = client.chat.completions.create(
-    model="gpt-5.6-terra",
-    messages=[
-        {"role": "user", "content": "写一个 Python 快速排序函数"}
-    ],
+response = client.responses.create(
+    model="gpt-6-astra",
+    input="给这个 Python 服务列出三个性能排查步骤",
 )
-
-print(response.choices[0].message.content)
+print(response.output_text)
 ```
 
-OpenAI 官方新项目更推荐使用 [Responses API](https://developers.openai.com/api/reference/resources/responses/methods/create)。使用兼容服务时，是否支持 `/responses`、工具调用、流式输出和图片输入，需要以平台文档为准。
+## 调用 Claude：Anthropic Messages API
 
-## GPT-5.6 Sol、Terra、Luna 怎么选？
+Claude 官方使用 `/v1/messages` 与 `anthropic-version` 请求头。**OpenAI 兼容地址不一定支持这套协议**；使用中转服务时，应确认它提供 Anthropic 兼容入口，或按照其 OpenAI 兼容文档调用 Claude 模型。
 
-| 模型 | 官方定位 | 推荐场景 |
-| --- | --- | --- |
-| `gpt-5.6-luna` | 成本敏感、高吞吐 | 摘要、分类、信息抽取、批量轻任务 |
-| `gpt-5.6-terra` | 能力与成本均衡 | 日常开发、内容生成、数据分析，适合作为默认模型 |
-| `gpt-5.6-sol` | 复杂专业任务 | 复杂编程、长链路 Agent、多模块排查和难题推理 |
-
-第一次接入建议先用 Terra 跑通，再把批量轻任务切到 Luna，只有真正复杂的任务再升级到 Sol。更完整的模型选择与代码示例见 [GPT-5.6 API 国内接入教程](docs/gpt-5-6-api.md)。
-
-## Codex 和 API 是一回事吗？
-
-不是。
-
-- **Codex** 是能够阅读仓库、修改文件、运行命令和测试的编程 Agent 产品。
-- **GPT API** 是模型调用接口。模型只负责生成响应，文件操作、终端执行和权限控制需要由客户端实现。
-- Codex 本地客户端支持使用 ChatGPT 账号或官方 API Key 登录；两种方式的计费和功能范围不同。
-- 中转站 Token 不等于 ChatGPT 账号，也不会自动获得 Codex 云端或 ChatGPT 套餐权益。
-
-已有 ChatGPT 套餐的用户应优先选择 `Sign in with ChatGPT`，避免误用 API Key 后产生独立 API 账单。详细说明见 [Codex 国内使用与 API 接入指南](docs/codex-china.md)。
-
-## 教程目录
-
-| 教程 | 解决的问题 | 主要关键词 |
-| --- | --- | --- |
-| [国内接入 ChatGPT / OpenAI API 完整教程](docs/gpt-api-china.md) | 官方 API 与兼容 API 的 curl、Python、Node.js 调用 | ChatGPT API 国内、OpenAI API 国内接入 |
-| [GPT-5.6 API 国内接入教程](docs/gpt-5-6-api.md) | Luna、Terra、Sol 选择与常见报错 | GPT-5.6 API、GPT5.6 API 怎么用 |
-| [Codex 国内使用与 API 接入指南](docs/codex-china.md) | ChatGPT 登录、API Key、中转 API 的区别 | Codex 国内怎么用、Codex API |
-| [没有 ChatGPT / OpenAI 账号怎么使用 GPT API](docs/no-openai-account.md) | 账号、会员与 API 的边界 | 没有 ChatGPT 账号、国内使用 GPT API |
-| [GPT API 中转站选择与避坑指南](docs/api-proxy-guide.md) | 计费、稳定性、隐私和 Token 安全 | GPT 中转站、OpenAI API 中转 |
-
-## 国内使用 GPT API 的安全建议
-
-1. 不要把 API Key、Token、邮箱验证码、Cookie 提交到公开仓库。
-2. 使用环境变量或密钥管理服务保存 Token；泄露后立即撤销并重新创建。
-3. 使用中转 API 时，不要上传客户隐私、生产密钥或未脱敏的公司代码。
-4. 中转站先用赠送额度或小额充值测试，不要长期存放大额余额。
-5. 核对实际模型名、输入输出 Token、缓存价格、失败请求计费和速率限制。
-6. 不购买共享 ChatGPT 账号，不向第三方提供官方账号密码。
-
-建议同时提交一份 `.gitignore`：
-
-```gitignore
-.env
-.env.*
-!.env.example
+```bash
+export ANTHROPIC_API_KEY="你的官方 API Key"
+export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 ```
 
-## 常见问题
+若使用 Anthropic 兼容中转入口，将上面两项换成该服务的 Token 与其明确标注的 Anthropic Base URL。
 
-### 国内可以调用 ChatGPT API 吗？
+```bash
+curl "${ANTHROPIC_BASE_URL}/v1/messages" \
+  -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "claude-opus-5",
+    "max_tokens": 512,
+    "messages": [{"role": "user", "content": "解释一下什么是 API 中转"}]
+  }'
+```
 
-代码层面可以使用 OpenAI SDK 或兼容协议调用，但实际可用性取决于服务支持地区、账号、网络和付款条件。无法顺利使用官方 API 的开发者，可以考虑 APIDock 这类 OpenAI 兼容 API。
+需要试用 Fable 5.1 时，把 `model` 改成 `claude-fable-5-1`，并确认账号或服务商已开放该模型。[Messages API 文档](https://platform.claude.com/docs/en/api/messages/create)列出了完整请求格式。
 
-### ChatGPT Plus 包含 OpenAI API 额度吗？
+## 接入前后检查什么
 
-不要把两者当成同一份余额。ChatGPT 套餐是产品订阅，官方 API 通常按平台用量单独计费。Codex 使用 ChatGPT 登录时走套餐权益；使用 API Key 登录时走 API 计费。
+1. 在平台模型列表核对**实际模型 ID**、接口类型、价格和限额；同名展示不保证接口能力相同。
+2. 用无敏感内容的小请求确认响应与用量账单，再测试流式输出、工具调用等所需功能。
+3. `401` 检查 Key；`404` 检查 Base URL、路径和模型名；`429` 检查额度与速率限制。
+4. Token 放在环境变量或密钥管理服务中；泄露后立即撤销并重建，不向他人提供密码、验证码或 Cookie。
 
-### 没有 ChatGPT 账号能使用 GPT API 吗？
-
-可以使用提供独立 Token 的兼容 API，但不会因此获得 ChatGPT 官网账号或 Plus 权益。见 [没有 OpenAI 账号的接入方案](docs/no-openai-account.md)。
-
-### 什么是 OpenAI 兼容 API？
-
-它使用与 OpenAI SDK 相近的请求格式，让现有代码通过修改 `base_url`、`api_key` 和 `model` 切换服务商。兼容程度并不完全相同，尤其要检查 Responses API、工具调用、图片、结构化输出和流式传输。
-
-### API 中转站靠谱吗？
-
-不能只凭“几折”判断。至少检查用量明细、模型列表、服务条款、隐私政策、限额能力和客服响应，并通过小额请求核对账单。详细检查清单见 [GPT API 中转站避坑指南](docs/api-proxy-guide.md)。
-
-## 官方资料
-
-- [OpenAI 模型列表](https://developers.openai.com/api/docs/models)
-- [OpenAI Responses API](https://developers.openai.com/api/reference/resources/responses/methods/create)
-- [Codex 认证方式](https://learn.chatgpt.com/docs/auth)
-
-## 免责声明
-
-本仓库是面向开发者的技术教程，不是 OpenAI 官方仓库。APIDock 等平台的模型、价格、支付方式和可用性可能调整；请遵守所在地法律法规和各服务的使用条款，并对自己的账号、数据和资金安全负责。
-
-如果内容对你有帮助，欢迎 Star、提交 Issue 或补充新的接入经验。
+更多背景见 [GPT API 国内接入教程](docs/gpt-api-china.md)、[GPT-5.6 选型说明](docs/gpt-5-6-api.md)和[中转服务检查清单](docs/api-proxy-guide.md)。

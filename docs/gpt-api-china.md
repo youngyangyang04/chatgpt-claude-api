@@ -4,7 +4,7 @@
 
 本文把官方 OpenAI API 与 OpenAI 兼容 API 放在同一套示例里：只要准备好 `API Key`、`API Base URL` 和模型名，就能先用 curl 验证，再接入 Python 或 Node.js 项目。
 
-> 本文更新于 2026-08-23。实时模型与接口以 [OpenAI 官方文档](https://developers.openai.com/api/docs/models) 或你所用平台后台为准。
+> 本文更新于 2026-09-15。OpenAI 已发布 GPT-6 Astra；实时模型与接口以 [OpenAI 官方文档](https://developers.openai.com/api/docs/models) 或你所用平台后台为准。
 
 ## 一、先分清 ChatGPT、OpenAI API 和兼容 API
 
@@ -37,7 +37,7 @@ https://api.openai.com/v1
 
 如果官方账号、付款或网络路径暂时不方便，可以使用兼容接口。原来使用 OpenAI SDK 的代码，通常只需修改 `base_url`、`api_key` 和 `model`。
 
-我自己更推荐 [APIDock](https://apidock.ai/)。它提供独立 Token、OpenAI 兼容地址和国内常用支付方式，适合国内开发者先把接口跑通。建议第一次只用赠送额度或小额充值，确认模型、稳定性和账单后再正式接入。
+我自己更推荐[文中链接的第三方兼容服务](https://apidock.ai/)。它提供独立 Token、OpenAI 兼容地址和国内常用支付方式，适合国内开发者先把接口跑通。建议第一次只用赠送额度或小额充值，确认模型、稳定性和账单后再正式接入。
 
 ## 三、设置环境变量
 
@@ -48,13 +48,14 @@ macOS / Linux：
 ```bash
 export OPENAI_API_KEY="替换成你的 API Key 或 Token"
 export OPENAI_BASE_URL="https://api.openai.com/v1"
-export OPENAI_MODEL="gpt-5.6-terra"
+export OPENAI_MODEL="gpt-6-astra"
 ```
 
-使用 APIDock 时，把地址改为：
+使用第三方兼容服务时，把地址改为平台提供的 Base URL，并将模型名改为平台实际开放的 ID。例如本文链接的服务地址为：
 
 ```bash
 export OPENAI_BASE_URL="https://apidock.ai/v1"
+export OPENAI_MODEL="gpt-5.6-terra"
 ```
 
 Windows PowerShell：
@@ -62,7 +63,7 @@ Windows PowerShell：
 ```powershell
 $env:OPENAI_API_KEY="替换成你的 API Key 或 Token"
 $env:OPENAI_BASE_URL="https://api.openai.com/v1"
-$env:OPENAI_MODEL="gpt-5.6-terra"
+$env:OPENAI_MODEL="gpt-6-astra"
 ```
 
 ## 四、curl：先确认接口能通
@@ -158,7 +159,7 @@ from openai import OpenAI
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 response = client.responses.create(
-    model="gpt-5.6-terra",
+    model="gpt-6-astra",
     input="用三句话解释 Responses API",
 )
 

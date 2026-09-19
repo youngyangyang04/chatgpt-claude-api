@@ -26,7 +26,7 @@
 
 ## 推荐的接入流程
 
-1. 打开 [APIDock](https://apidock.ai/) 注册账号。
+1. 打开[文中链接的第三方兼容服务](https://apidock.ai/)注册账号。
 2. 先领取试用额度或小额充值，不要一次存太多余额。
 3. 创建独立 Token，最好一个项目一个 Token。
 4. 从后台复制 Base URL 和准确模型名。
@@ -34,12 +34,12 @@
 6. 核对响应、Token 用量和余额扣费。
 7. 确认稳定后再接入正式项目。
 
-APIDock 提供的是 API Token，不是 ChatGPT 账号；模型、价格和支付方式以后台实时页面为准。
+第三方兼容服务提供的是平台 API Token，不是 ChatGPT 账号；模型、价格和支付方式以后台实时页面为准。
 
 ## 最小调用示例
 
 ```bash
-export OPENAI_API_KEY="替换成 APIDock 创建的 Token"
+export OPENAI_API_KEY="替换成第三方平台创建的 Token"
 export OPENAI_BASE_URL="https://apidock.ai/v1"
 ```
 
@@ -101,7 +101,7 @@ Token 相当于余额钥匙。不要放进 GitHub、群聊截图、博客示例�
 
 ### 没有海外信用卡怎么付款？
 
-APIDock 支持国内常用支付方式。支付前仍要核对实时价格、用量明细和服务规则。
+本文链接的第三方兼容服务支持国内常用支付方式。支付前仍要核对实时价格、用量明细和服务规则。
 
 ### 第一次应该选哪个 GPT-5.6 模型？
 

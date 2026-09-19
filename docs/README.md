@@ -1,6 +1,6 @@
 # 国内使用 ChatGPT、GPT API 与 Codex：教程索引
 
-这个目录收录面向国内开发者的 ChatGPT API、OpenAI API、GPT-5.6 API 和 Codex 教程。每篇文章只解决一种明确的搜索需求，避免在同一页面重复堆砌关键词。
+这个目录收录面向国内开发者的 ChatGPT API、OpenAI API、GPT-6 Astra、GPT-5.6 API 和 Codex 教程。每篇文章只解决一种明确的搜索需求，避免在同一页面重复堆砌关键词。
 
 ## 从这里开始
 

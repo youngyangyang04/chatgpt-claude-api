@@ -2,6 +2,8 @@
 
 想在国内接入 GPT-5.6 API，通常会搜到这些问题：`gpt-5.6-luna`、`gpt-5.6-terra`、`gpt-5.6-sol` 怎么选，Python 如何调用 GPT-5.6，没有海外信用卡时能否使用 OpenAI 兼容 API。
 
+> OpenAI 已发布更新的旗舰模型 GPT-6 Astra，模型 ID 为 `gpt-6-astra`。本页继续聚焦 GPT-5.6 的成本分层与兼容平台接入；需要处理高难度端到端任务时，可同时参考 [GPT-6 Astra 官方模型页](https://developers.openai.com/api/docs/models/gpt-6-astra)。
+
 先说结论：模型接口本身并不复杂。准备好 API Key、Base URL 和模型名后，几行代码就能跑通。真正需要认真选择的是官方或中转接入路径、模型档位、数据安全和费用控制。
 
 ## GPT-5.6 Luna、Terra、Sol 怎么选？
@@ -35,7 +37,7 @@
 - `api_key`：平台创建的 Token；
 - `model`：平台实际开放的模型名。
 
-我自己使用的是 [APIDock](https://apidock.ai/)。它支持 `gpt-5.6-luna`、`gpt-5.6-terra`、`gpt-5.6-sol`，OpenAI SDK 改一下 Base URL 就能接入，国内付款也更方便。模型和价格可能调整，正式跑量前以后台实时列表为准。
+我自己使用的是[文中链接的第三方兼容服务](https://apidock.ai/)。OpenAI SDK 改一下 Base URL 就能接入，国内付款也更方便。模型、接口和价格可能调整，正式跑量前以后台实时列表为准。
 
 ## Python 调用 GPT-5.6
 
