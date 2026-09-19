@@ -2,7 +2,9 @@
 
 想在国内调用 GPT API 或 Claude API？本文以 GPT-6 Astra、GPT-5.6、Claude Opus 5 和 Fable 5.1 为例，介绍模型 ID、官方接口与中转站的区别，并给出可直接运行的 `curl` 和 Python 接入示例。
 
-> 更新于 2026-09-19。模型开放范围、接口能力和价格会变化，实际以[OpenAI 模型列表](https://developers.openai.com/api/docs/models)、[Claude 模型列表](https://platform.claude.com/docs/en/models/overview)及服务商后台为准。本仓库是独立教程，与模型厂商无官方关联。
+> 非官方声明： 本项目为独立的第三方教程整理项目，与 OpenAI、Anthropic、GitHub 等公司不存在官方合作、授权或隶属关系。ChatGPT、OpenAI、Claude、Anthropic 等商标归各自权利人所有。
+
+> 更新于 2026-09-19。如果你对有帮助的话，希望给一个小⭐️⭐️支持一下，本教程持续更新。
 
 ## 先选接入方式
 
@@ -13,9 +15,9 @@
 
 国内直接接入 GPT API、Claude API 需要中转，否则无法直接接入。 
 
-需要中转服务的话，可以参考我推荐的[这家兼容服务及选择方法](https://apidock.ai/)。 
+需要中转服务的话，可以参考这家的[中转服务](https://apidock.ai/)。
 
-![](https://file1.kamacoder.com/i/web/20260919161434-n3c8v9.png)
+![中转服务接入示意图](assets/images/api-proxy-overview.png)
 
 它提供独立 Token 和接入说明；**先确认所需模型是否开放、支持哪种接口协议，再用小额请求测试**。中转服务会处理请求内容，敏感数据应先评估隐私条款。
 
@@ -34,74 +36,21 @@ ChatGPT Plus、Claude 订阅与 API 用量分别计费；网页会员资格不�
 
 这只是选型起点，生产环境最好用自己的任务比较效果、延迟和每次完成任务的成本。[OpenAI 模型说明](https://developers.openai.com/api/docs/models)与[Claude 选型指南](https://platform.claude.com/docs/en/about-claude/models/choosing-a-model)提供最新定位。
 
-## 调用 GPT：OpenAI Responses API
+## 使用中转接入Claude Code、GPT API
 
-先设置 Key 与 Base URL。使用官方 API 时：
+流程不复杂：
 
-```bash
-export OPENAI_API_KEY="你的官方 API Key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"
-```
+1. 打开 [APIDock](https://apidock.ai/) 注册账号。
+2. 在后台创建自己的 API Key，不要把 Key 发给别人。
+3. 先到 [模型与价格页](https://apidock.ai/pricing) 确认 Fable 5.1 已对当前账户开放，并核对实时单价。
+4. 按 [APIDock一键安装文档](https://apidock.ai/docs/apidock-easy-install) 配置 Claude Code。
+5. 安装完成后，用专属命令 `claude-apidock` 启动。
+6. 选择模型 `claude-opus-5`，先发一个小任务验证。
 
-使用支持 **Responses API** 的中转服务时，把两项分别换成服务商 Token 和其提供的 OpenAI 兼容 Base URL。不要凭域名猜测路径，也不要把真实 Token 提交到 GitHub。
+APIDock 的一键工具使用独立配置，不会覆盖原来的 `claude` 命令。以后需要换 Key，可以按文档运行 `apidock reset claude-code`。
 
-```bash
-curl "${OPENAI_BASE_URL}/responses" \
-  -H "Authorization: Bearer ${OPENAI_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-5.6-terra",
-    "input": "用一句话解释 API 是什么"
-  }'
-```
+![APIDock令牌创建页](assets/images/token-creation.jpg)
 
-想测试最新旗舰模型，将 `model` 改为 `gpt-6-astra`。中转服务若只兼容 `/chat/completions`，应按其文档调整请求格式；工具调用等高级能力也需逐项验证。
-
-Python 项目可使用官方 SDK：
-
-```bash
-pip install openai
-```
-
-```python
-import os
-from openai import OpenAI
-
-client = OpenAI(
-    api_key=os.environ["OPENAI_API_KEY"],
-    base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
-)
-response = client.responses.create(
-    model="gpt-6-astra",
-    input="给这个 Python 服务列出三个性能排查步骤",
-)
-print(response.output_text)
-```
-
-## 调用 Claude：Anthropic Messages API
-
-Claude 官方使用 `/v1/messages` 与 `anthropic-version` 请求头。**OpenAI 兼容地址不一定支持这套协议**；使用中转服务时，应确认它提供 Anthropic 兼容入口，或按照其 OpenAI 兼容文档调用 Claude 模型。
-
-```bash
-export ANTHROPIC_API_KEY="你的官方 API Key"
-export ANTHROPIC_BASE_URL="https://api.anthropic.com"
-```
-
-若使用 Anthropic 兼容中转入口，将上面两项换成该服务的 Token 与其明确标注的 Anthropic Base URL。
-
-```bash
-curl "${ANTHROPIC_BASE_URL}/v1/messages" \
-  -H "x-api-key: ${ANTHROPIC_API_KEY}" \
-  -H "anthropic-version: 2023-06-01" \
-  -H "content-type: application/json" \
-  -d '{
-    "model": "claude-opus-5",
-    "max_tokens": 512,
-    "messages": [{"role": "user", "content": "解释一下什么是 API 中转"}]
-  }'
-```
-
-需要试用 Fable 5.1 时，把 `model` 改成 `claude-fable-5-1`，并确认账号或服务商已开放该模型。[Messages API 文档](https://platform.claude.com/docs/en/api/messages/create)列出了完整请求格式。
 
 ## 接入前后检查什么
 
