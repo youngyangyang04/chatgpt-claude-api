@@ -9,6 +9,7 @@
 - [Codex 国内使用与 API 接入指南](codex-china.md)：区分 ChatGPT 登录、官方 API Key 和中转 API。
 - [没有 ChatGPT / OpenAI 账号怎么使用 GPT API](no-openai-account.md)：解释没有官方账号时能做什么、不能做什么。
 - [GPT API 中转站选择与避坑指南](api-proxy-guide.md)：检查计费、模型、稳定性、隐私与 Token 安全。
+- [Claude 账号防封答疑手册](claude-account-safety-faq.md)：账号六不原则、ping0.cc 环境自测与七条防风控技巧。
 
 ## 推荐阅读顺序
 
